@@ -35,6 +35,7 @@ a{color:var(--coral-deep)}a:hover{color:var(--pine)}
 .head-star{position:absolute;right:max(60px,6vw);top:170px;width:78px;transform:rotate(-10deg);filter:drop-shadow(-14px 26px 32px rgba(110,26,12,.48))}
 .head-bow{position:absolute;right:24px;top:18px;width:75px;transform:rotate(-8deg);filter:drop-shadow(-14px 26px 32px rgba(110,26,12,.48))}
 @media (max-width:760px){.head-star,.head-bow{opacity:.45}}
+.o,.orn img,.head-star,.head-bow,.dates img{background:transparent!important;border:0;box-shadow:none}
 .o{display:block;flex:none;height:auto;filter:drop-shadow(-3px 6px 6px rgba(28,60,45,.22))}
 .band-o{filter:drop-shadow(-6px 10px 10px rgba(0,0,0,.32))}
 .dates img{width:26px;height:auto;display:block;filter:drop-shadow(-3px 6px 6px rgba(110,26,12,.4))}
@@ -67,8 +68,8 @@ a{color:var(--coral-deep)}a:hover{color:var(--pine)}
 .band .meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:15px}
 .band .meta span{display:flex;align-items:center;gap:8px}
 .band .meta b{font-weight:700}
-.tablebox{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:1040px}
+.tablebox{overflow:visible}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;table-layout:auto}
 th{text-align:left;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:16px 12px;border-bottom:2px solid var(--fg);white-space:nowrap}
 th div{display:flex;align-items:center;gap:6px}
 td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -76,19 +77,31 @@ tbody tr:nth-child(even){background:var(--row-alt)}
 td.t{font-weight:700}
 td.d span{display:inline-flex;align-items:center;gap:5px;background:var(--lav);color:var(--ink);border-radius:999px;padding:4px 12px;font-weight:700;font-size:13px;white-space:nowrap}
 td.p{color:var(--muted);font-style:italic}
-td.n,th.n{text-align:center;width:110px}
+td.n,th.n{text-align:center;width:96px}
 th.n div{justify-content:center}
-.n span{display:inline-grid;place-items:center;min-width:34px;height:34px;border-radius:50%;background:var(--coral);color:#fff;font-weight:700}
+.n span{font-weight:700;font-size:18px;color:var(--coral-deep)}
 .brand{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;border:1.5px solid var(--fg);white-space:nowrap}
 .brand.is{border-style:dashed}
 .state-row td{background:var(--panel);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:9px 12px;color:var(--fg)}
 .state-row td div{display:flex;align-items:center;gap:8px}
 .empty{padding:40px 0;color:var(--muted);display:flex;align-items:center;gap:12px}
-.who{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.who{display:flex;align-items:center;gap:8px}
 .who i{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--panel);color:var(--coral-deep);flex:none}
 footer{margin-top:56px;background:var(--coral);color:var(--cream)}
 footer .wrap{padding-block:32px;font-size:15px;display:flex;align-items:center;gap:12px}
 
+@media (max-width:820px){
+  thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:14px 4px;border-bottom:1px solid var(--line)}
+  tbody tr.state-row{display:block;padding:0;border:0}
+  td{border:0;padding:0}
+  td.t{grid-column:1;font-size:17px}
+  td.n{grid-column:2;grid-row:1 / span 2;width:auto;align-self:center}
+  td.d{grid-column:1}
+  tbody tr td:nth-child(n+3):not(.n){grid-column:1 / -1}
+  td[data-l]::before{content:attr(data-l);display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:2px}
+}
 @media print{.controls,.ribbon{display:none!important}td{padding:5px 10px!important}.state-row td{padding:4px 10px!important}.n span{min-width:22px!important;height:22px!important;font-size:12px}.head .wrap{padding-block:36px 32px!important}.region{margin-top:18px!important}footer{margin-top:20px!important}table{min-width:0}.region{break-inside:auto}.band{break-after:avoid}tr{break-inside:avoid}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
@@ -292,7 +305,7 @@ try{ active = +(localStorage.getItem('reg')||0) || 0; if(!REG[active]) active=0;
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const total = DATA.reduce((a,d)=>a+d.n,0);
-const cell = (v,cls='',k='') => v ? `<td class="${cls}">${cls==='d'?`<span>${ic('pin',13)}${esc(v)}</span>`:`<div class="who">${k?`<i>${ic(k,14)}</i>`:''}${esc(v)}</div>`}</td>` : `<td class="p">${PEND}</td>`;
+const cell = (v,cls='',k='',l='') => v ? `<td class="${cls}"${l?` data-l="${l}"`:''}>${cls==='d'?`<span>${ic('pin',13)}${esc(v)}</span>`:`<div class="who">${esc(v)}</div>`}</td>` : `<td class="p">${PEND}</td>`;
 
 function chips(){
   const items = [{k:0,label:'Todas',o:'arbol',sub:`${DATA.length} tiendas · ${total} eventuales`}]
@@ -309,12 +322,12 @@ function render(){
     shown += rows.length; const n = rows.reduce((a,d)=>a+d.n,0); ev += n;
     let body='', last='';
     rows.forEach(d=>{
-      if(d.e!==last){ body += `<tr class="state-row"><td colspan="7"><div>${obj('estrella',20)}${esc(d.e)}</div></td></tr>`; last=d.e; }
-      body += `<tr><td class="t">${esc(d.t)}</td><td><span class="brand ${d.m==='Isadora'?'is':''}">${ic('tag',13)}${esc(d.m)}</span></td>${cell(d.d,'d')}${cell(d.vcd,'','user')}${cell(d.rec,'','mail')}${cell(d.hrbp,'','heart')}<td class="n"><span>${d.n}</span></td></tr>`;
+      if(d.e!==last){ body += `<tr class="state-row"><td colspan="6"><div>${obj('estrella',20)}${esc(d.e)}</div></td></tr>`; last=d.e; }
+      body += `<tr><td class="t">${esc(d.t)}</td>${cell(d.d,'d')}${cell(d.vcd,'','user','VCD')}${cell(d.rec,'','mail','Reclutadora')}${cell(d.hrbp,'','heart','HRBP')}<td class="n"><span>${d.n}</span></td></tr>`;
     });
     html += `<section class="region"><div class="band"><div class="wrap"><h2>${obj(['esfera','estrella','regalo'][(r-1)%3],46,'o band-o')}Región ${r}</h2>
       <div class="meta"><span>${ic('user',18)}VCR <b>${esc(REG[r].vcr)}</b></span><span>${ic('store',18)}<b>${rows.length}</b> tiendas</span><span>${ic('users',18)}<b>${n}</b> eventuales</span></div></div></div>
-      <div class="wrap tablebox"><table><thead><tr><th><div>${ic('store',15)}Tienda</div></th><th><div>${ic('bag',15)}Marca</div></th><th><div>${ic('map',15)}Distrito</div></th><th><div>${ic('user',15)}VCD</div></th><th><div>${ic('search2',15)}Reclutadora</div></th><th><div>${ic('heart',15)}HRBP</div></th><th class="n"><div>${ic('users',15)}Eventuales</div></th></tr></thead><tbody>${body}</tbody></table></div></section>`;
+      <div class="wrap tablebox"><table><thead><tr><th><div>${ic('store',15)}Tienda</div></th><th><div>${ic('map',15)}Distrito</div></th><th><div>${ic('user',15)}VCD</div></th><th><div>${ic('search2',15)}Reclutadora</div></th><th><div>${ic('heart',15)}HRBP</div></th><th class="n"><div>${ic('users',15)}Eventuales</div></th></tr></thead><tbody>${body}</tbody></table></div></section>`;
   });
   document.getElementById('list').innerHTML = html || `<div class="wrap empty">${obj('cascabel',40)}No encontramos tiendas con esa búsqueda. Revisa la ortografía o elige “Todas”.</div>`;
   document.getElementById('count').innerHTML = `${obj('regalo',22)}Mostrando <b>${shown}</b> tiendas · <b>${ev}</b> eventuales`;
